@@ -1,4 +1,4 @@
-# Yiimp_install_scrypt v0.2 (update Avril, 2020)
+# yiimp_install_raspberry
 
 Site : https://www.xavatar.com
 
