@@ -1,35 +1,44 @@
 # yiimp_install_raspberry
 
-Site : https://www.xavatar.com
+Site : http://multiply.network
 
-Discord : https://discord.gg/zcCXjkQ
-
-TUTO Youtube (16.04 / 18.04 - Without SSL) : https://www.youtube.com/watch?v=qE0rhfJ1g2k
+Discord : https://discord.gg/7GdfjBxd
 
 Official Yiimp (used in this script for Yiimp Installation): https://github.com/tpruvot/yiimp
 
-Original Yiimp Installer : https://github.com/cryptopool-builders/multipool_original_yiimp_installer
+Original Yiimp Installer : https://github.com/xavatar/yiimp_install_scrypt
 
+TUTO Youtube (16.04 / 18.04 - Without SSL) : https://www.youtube.com/watch?v=qE0rhfJ1g2k
 
 ***********************************
 
-## Install script for yiimp on Ubuntu Server 16.04 / 18.04 (use Tpruvot's Yiimp)
+## Install script for yiimp on Ubuntu Server 20.04 on Raspberry Pi 4
 
-USE THIS SCRIPT ON FRESH INSTALL UBUNTU Server 16.04 / 18.04 !
+USE THIS SCRIPT ON FRESH INSTALL UBUNTU Server 20.04 !
 
-Connect on your VPS =>
-- apt update
-- apt upgrade
-- reboot
-- adduser pool (pool it's just an example...)
-- adduser pool sudo
-- su - pool
-- exit 
-- su - pool
-- sudo apt -y install git
-- git clone https://github.com/eskal/yiimp_install_scrypt.git
-- cd yiimp_install_scrypt/
-- bash install.sh (DO NOT RUN THE SCRIPT AS ROOT or SUDO)
+Connect on your Raspberry Pi 4 and run this command =>
+
+Update your system
+```
+sudo apt update
+sudo apt upgrade
+sudo reboot
+```
+Create a user (pool it's just an example...)
+```
+sudo adduser pool
+sudo adduser pool sudo
+su - pool
+exit 
+su - pool
+sudo apt -y install git
+git clone https://github.com/Multiplity-in-Network/yiimp_install_raspberry.git
+cd yiimp_install_raspberry/
+```
+DO NOT RUN THE NEXT SCRIPT AS ROOT or SUDO
+```
+bash install.sh
+```
 - At the end, you MUST REBOOT to finalize installation...
 
 Finish !
@@ -71,7 +80,7 @@ While I did add some server security to the script, it is every server owners re
 
 There will be several wallets already in yiimp. These have nothing to do with the installation script and are from the database import from the yiimp github. 
 
-If you need further assistance we have a small but growing discord channel at https://discord.gg/zcCXjkQ
+If you need further assistance we have a small but growing discord channel at https://discord.gg/7GdfjBxd
 
 If this helped you or you feel giving please donate : 
 - BTC Donation : 1C1hnjk3WhuAvUN6Ny6LTxPD3rwSZwapW7
