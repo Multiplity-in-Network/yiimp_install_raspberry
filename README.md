@@ -19,13 +19,13 @@ USE THIS SCRIPT ON FRESH INSTALL UBUNTU Server 20.04 !
 Connect on your Raspberry Pi 4 and run this command =>
 
 Update your system
-```
+```bash
 sudo apt update
 sudo apt upgrade
 sudo reboot
 ```
 Create a user (pool it's just an example...)
-```
+```bash
 sudo adduser pool
 sudo adduser pool sudo
 su - pool
@@ -36,7 +36,7 @@ git clone https://github.com/Multiplity-in-Network/yiimp_install_raspberry.git
 cd yiimp_install_raspberry/
 ```
 DO NOT RUN THE NEXT SCRIPT AS ROOT or SUDO
-```
+```bash
 bash install.sh
 ```
 - At the end, you MUST REBOOT to finalize installation...

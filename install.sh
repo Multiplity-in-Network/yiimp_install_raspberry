@@ -1,27 +1,28 @@
 #!/bin/bash
 ################################################################################
-# Original Author:   crombiecrunch
-# Modified by : Xavatar (https://github.com/xavatar/yiimp_install_scrypt)
+# Original Author: crombiecrunch
+# Modified by : Xavatar
+# Modified by Multiplity in Network
 # Web: https://www.xavatar.com    
 #
 # Program:
-#   Install yiimp on Ubuntu 16.04/18.04 running Nginx, MariaDB, and php7.2
-#   v0.2 (update Avril, 2020)
+#   Install yiimp on Ubuntu 20.04 running Nginx, MariaDB, and php7.4
+#   v0.3 (update Julio, 2021)
 # 
 ################################################################################
     
 
     output() {
-    printf "\E[0;33;40m"
-    echo $1
-    printf "\E[0m"ku
+      printf "\E[0;33;40m"
+      echo $1
+      printf "\E[0m"ku
     }
 
     displayErr() {
-    echo
-    echo $1;
-    echo
-    exit 1;
+      echo
+      echo $1;
+      echo
+      exit 1;
     }
 
     #Add user group sudo + no password
@@ -45,8 +46,8 @@
     clear
     echo
     echo -e "$GREEN************************************************************************$COL_RESET"
-    echo -e "$GREEN Yiimp Install Script v0.2 $COL_RESET"
-    echo -e "$GREEN Install yiimp on Ubuntu 16.04/18.04 running Nginx, MariaDB, and php7.4 $COL_RESET"
+    echo -e "$GREEN Yiimp Install Script v0.3                                              $COL_RESET"
+    echo -e "$GREEN Install yiimp on Ubuntu 20.04 running Nginx, MariaDB, and php7.4       $COL_RESET"
     echo -e "$GREEN************************************************************************$COL_RESET"
     echo
     sleep 3
@@ -67,7 +68,7 @@
     echo -e "$GREEN Done...$COL_RESET"
 
 
-    source conf/prerequisite.sh
+    source conf/prerequisites.sh
     sleep 3
     source conf/getip.sh
 
