@@ -1,14 +1,36 @@
 #!/bin/bash
 ################################################################################
+# Source: https://github.com/Multiplity-in-Network/yiimp_install_raspberry
+# Web: http://multiply.network
 # Original Author: crombiecrunch
-# Modified by : Xavatar
+# Modified by Xavatar
 # Modified by Multiplity in Network
-# Web: https://www.xavatar.com    
 #
 # Program:
 #   Install yiimp on Ubuntu 20.04 running Nginx, MariaDB, and php7.4
 #   v0.3 (update Julio, 2021)
-# 
+#
+# ███╗   ███╗██╗   ██╗██╗  ████████╗██╗██████╗ ██╗     ██╗████████╗██╗   ██╗
+# ████╗ ████║██║   ██║██║  ╚══██╔══╝██║██╔══██╗██║     ██║╚══██╔══╝╚██╗ ██╔╝
+# ██╔████╔██║██║   ██║██║     ██║   ██║██████╔╝██║     ██║   ██║    ╚████╔╝
+# ██║╚██╔╝██║██║   ██║██║     ██║   ██║██╔═══╝ ██║     ██║   ██║     ╚██╔╝
+# ██║ ╚═╝ ██║╚██████╔╝███████╗██║   ██║██║     ███████╗██║   ██║      ██║
+# ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝╚═╝     ╚══════╝╚═╝   ╚═╝      ╚═╝
+#
+#                            ██╗███╗   ██╗
+#                            ██║████╗  ██║
+#                            ██║██╔██╗ ██║
+#                            ██║██║╚██╗██║
+#                            ██║██║ ╚████║
+#                            ╚═╝╚═╝  ╚═══╝
+#
+#      ███╗   ██╗███████╗████████╗██╗    ██╗ ██████╗ ██████╗ ██╗  ██╗
+#      ████╗  ██║██╔════╝╚══██╔══╝██║    ██║██╔═══██╗██╔══██╗██║ ██╔╝
+#      ██╔██╗ ██║█████╗     ██║   ██║ █╗ ██║██║   ██║██████╔╝█████╔╝
+#      ██║╚██╗██║██╔══╝     ██║   ██║███╗██║██║   ██║██╔══██╗██╔═██╗
+#      ██║ ╚████║███████╗   ██║   ╚███╔███╔╝╚██████╔╝██║  ██║██║  ██╗
+#      ╚═╝  ╚═══╝╚══════╝   ╚═╝    ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+#
 ################################################################################
     
 
@@ -102,98 +124,8 @@
     #sudo apt -y install aptitude
     #echo -e "$GREEN Done...$COL_RESET $COL_RESET"
 
-
-    # Installing Nginx
-    echo
-    echo
-    echo -e "$CYAN => Installing Nginx server : $COL_RESET"
-    echo
-    sleep 3
-    
-    if [ -f /usr/sbin/apache2 ]; then
-    echo -e "Removing apache..."
-    sudo apt-get -y purge apache2 apache2-*
-    sudo apt-get -y --purge autoremove
-    fi
-
-    sudo apt -y install nginx
-    sudo rm /etc/nginx/sites-enabled/default
-    sudo systemctl start nginx.service
-    sudo systemctl enable nginx.service
-    sudo systemctl start cron.service
-    sudo systemctl enable cron.service
-    sleep 5
-    sudo systemctl status nginx | sed -n "1,3p"
-    sleep 15
-    echo
-    echo -e "$GREEN Done...$COL_RESET"
-    
-
-    # Making Nginx a bit hard
-    echo 'map $http_user_agent $blockedagent {
-    default         0;
-    ~*malicious     1;
-    ~*bot           1;
-    ~*backdoor      1;
-    ~*crawler       1;
-    ~*bandit        1;
-    }
-    ' | sudo -E tee /etc/nginx/blockuseragents.rules >/dev/null 2>&1
-    
-    
-    # Installing Mariadb
-    echo
-    echo
-    echo -e "$CYAN => Installing Mariadb Server : $COL_RESET"
-    echo
-    sleep 3
-        
-    # Create random password
-    rootpasswd=$(openssl rand -base64 12)
-    export DEBIAN_FRONTEND="noninteractive"
-    sudo apt -y install mariadb-server
-    sudo systemctl enable mariadb.service
-    sudo systemctl start mariadb.service
-    sleep 5
-    sudo systemctl status mariadb | sed -n "1,3p"
-    sleep 15
-    echo
-    echo -e "$GREEN Done...$COL_RESET"
-
-    
-    # Installing Installing php7.4
-    echo
-    echo
-    echo -e "$CYAN => Installing php7.4 : $COL_RESET"
-    echo
-    sleep 3
-    
-    source conf/pool.conf
-    if [ ! -f /etc/apt/sources.list.d/ondrej-php-bionic.list ]; then
-    sudo add-apt-repository -y ppa:ondrej/php
-    fi
-    sudo apt -y update
-
-    if [[ ("$DISTRO" == "16") ]]; then
-    sudo apt -y install php7.2-fpm php7.2-opcache php7.2 php7.2-common php7.2-gd php7.2-mysql php7.2-imap php7.2-cli \
-    php7.2-cgi php-pear php-auth imagemagick libruby php7.2-curl php7.2-intl php7.2-pspell mcrypt\
-    php7.2-recode php7.2-sqlite3 php7.2-tidy php7.2-xmlrpc php7.2-xsl memcached php-memcache php-imagick php-gettext php7.2-zip php7.2-mbstring
-    #sudo phpenmod mcrypt
-    #sudo phpenmod mbstring
-    else
-    sudo apt -y install php7.2-fpm php7.2-opcache php7.2 php7.2-common php7.2-gd php7.2-mysql php7.2-imap php7.2-cli \
-    php7.2-cgi php-pear imagemagick libruby php7.2-curl php7.2-intl php7.2-pspell mcrypt\
-    php7.2-recode php7.2-sqlite3 php7.2-tidy php7.2-xmlrpc php7.2-xsl memcached php7.2-memcache php7.2-memcached php-imagick php-gettext php7.2-zip php7.2-mbstring \
-    libpsl-dev libnghttp2-dev
-    fi
-    sleep 5
-    sudo systemctl start php7.2-fpm
-    sudo systemctl status php7.2-fpm | sed -n "1,3p"
-    sleep 15
-    echo
-    echo -e "$GREEN Done...$COL_RESET"
-
-
+    # Installing other needed files
+    source conf/servers.sh
     
     # Installing other needed files
     echo
@@ -256,177 +188,17 @@
     fi
     fi
     echo -e "$GREEN Done...$COL_RESET"
-    
+
     # Installing Fail2Ban & UFW
-    echo
-    echo
-    echo -e "$CYAN => Some optional installs (Fail2Ban & UFW) $COL_RESET"
-    echo
-    sleep 3
-    
-    
-    if [[ ("$install_fail2ban" == "y" || "$install_fail2ban" == "Y" || "$install_fail2ban" == "") ]]; then
-    sudo apt -y install fail2ban
-    sleep 5
-    sudo systemctl status fail2ban | sed -n "1,3p"
-        fi
+    source conf/fail2ban.sh
 
 
-    if [[ ("$UFW" == "y" || "$UFW" == "Y" || "$UFW" == "") ]]; then
-    sudo apt -y install ufw
-    sudo ufw default deny incoming
-    sudo ufw default allow outgoing
-    sudo ufw allow ssh
-    sudo ufw allow http
-    sudo ufw allow https
-    sudo ufw allow 3333/tcp
-    sudo ufw allow 3339/tcp
-    sudo ufw allow 3334/tcp
-    sudo ufw allow 3433/tcp
-    sudo ufw allow 3555/tcp
-    sudo ufw allow 3556/tcp
-    sudo ufw allow 3573/tcp
-    sudo ufw allow 3535/tcp
-    sudo ufw allow 3533/tcp
-    sudo ufw allow 3553/tcp
-    sudo ufw allow 3633/tcp
-    sudo ufw allow 3733/tcp
-    sudo ufw allow 3636/tcp
-    sudo ufw allow 3737/tcp
-    sudo ufw allow 3739/tcp
-    sudo ufw allow 3747/tcp
-    sudo ufw allow 3833/tcp
-    sudo ufw allow 3933/tcp
-    sudo ufw allow 4033/tcp
-    sudo ufw allow 4133/tcp
-    sudo ufw allow 4233/tcp
-    sudo ufw allow 4234/tcp
-    sudo ufw allow 4333/tcp
-    sudo ufw allow 4433/tcp
-    sudo ufw allow 4533/tcp
-    sudo ufw allow 4553/tcp
-    sudo ufw allow 4633/tcp
-    sudo ufw allow 4733/tcp
-    sudo ufw allow 4833/tcp
-    sudo ufw allow 4933/tcp
-    sudo ufw allow 5033/tcp
-    sudo ufw allow 5133/tcp
-    sudo ufw allow 5233/tcp
-    sudo ufw allow 5333/tcp
-    sudo ufw allow 5433/tcp
-    sudo ufw allow 5533/tcp
-    sudo ufw allow 5733/tcp
-    sudo ufw allow 5743/tcp
-    sudo ufw allow 3252/tcp
-    sudo ufw allow 5755/tcp
-    sudo ufw allow 5766/tcp
-    sudo ufw allow 5833/tcp
-    sudo ufw allow 5933/tcp
-    sudo ufw allow 6033/tcp
-    sudo ufw allow 5034/tcp
-    sudo ufw allow 6133/tcp
-    sudo ufw allow 6233/tcp
-    sudo ufw allow 6333/tcp
-    sudo ufw allow 6433/tcp
-    sudo ufw allow 7433/tcp
-    sudo ufw allow 8333/tcp
-    sudo ufw allow 8463/tcp
-    sudo ufw allow 8433/tcp
-    sudo ufw allow 8533/tcp
-    sudo ufw --force enable
-    sleep 5
-    sudo systemctl status ufw | sed -n "1,3p"   
-    fi
-
-    
-    echo
-    echo -e "$GREEN Done...$COL_RESET"
-
-    
     # Installing PhpMyAdmin
-    echo
-    echo
-    echo -e "$CYAN => Installing phpMyAdmin $COL_RESET"
-    echo
-    sleep 3
-    
-    echo "phpmyadmin phpmyadmin/reconfigure-webserver multiselect" | sudo debconf-set-selections
-    echo "phpmyadmin phpmyadmin/dbconfig-install boolean true" | sudo debconf-set-selections
-    echo "phpmyadmin phpmyadmin/mysql/admin-user string root" | sudo debconf-set-selections
-    echo "phpmyadmin phpmyadmin/mysql/admin-pass password $rootpasswd" | sudo debconf-set-selections
-    echo "phpmyadmin phpmyadmin/mysql/app-pass password $AUTOGENERATED_PASS" | sudo debconf-set-selections
-    echo "phpmyadmin phpmyadmin/app-password-confirm password $AUTOGENERATED_PASS" | sudo debconf-set-selections
-    sudo apt -y install phpmyadmin
-    echo -e "$GREEN Done...$COL_RESET"
-    
-    
+    source conf/phpmyadmin.sh
+
+
     # Installing Yiimp
-    echo
-    echo
-    echo -e "$CYAN => Installing Yiimp $COL_RESET"
-    echo
-    echo -e "Grabbing yiimp fron Github, building files and setting file structure."
-    echo
-    sleep 3
-    
-
-    # Generating Random Password for stratum
-    blckntifypass=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
-    
-    # Compil Blocknotify
-    cd ~
-    git clone https://github.com/Kudaraidee/yiimp.git
-    cd $HOME/yiimp/blocknotify
-    sudo sed -i 's/tu8tu5/'$blckntifypass'/' blocknotify.cpp
-    make -j$((`nproc`+1))
-    
-    # Compil Stratum
-    cd $HOME/yiimp/stratum/
-    git submodule init && git submodule update 
-    make -C algos
-    make -C sha3
-    make -C iniparser
-    cd secp256k1 && chmod +x autogen.sh && ./autogen.sh && ./configure --enable-experimental --enable-module-ecdh --with-bignum=no --enable-endomorphism && make
-    cd $HOME/yiimp/stratum/
-    if [[ ("$BTC" == "y" || "$BTC" == "Y") ]]; then
-    sudo sed -i 's/CFLAGS += -DNO_EXCHANGE/#CFLAGS += -DNO_EXCHANGE/' $HOME/yiimp/stratum/Makefile
-    fi
-    make -j$((`nproc`+1))
-    
-    # Copy Files (Blocknotify,iniparser,Stratum)
-    cd $HOME/yiimp
-    sudo sed -i 's/AdminRights/'AdminPanel'/' $HOME/yiimp/web/yaamp/modules/site/SiteController.php
-    sudo cp -r $HOME/yiimp/web /var/
-    sudo mkdir -p /var/stratum
-    cd $HOME/yiimp/stratum
-    sudo cp -a config.sample/. /var/stratum/config
-    sudo cp -r stratum /var/stratum
-    sudo cp -r run.sh /var/stratum
-    cd $HOME/yiimp
-    sudo cp -r $HOME/yiimp/bin/. /bin/
-    sudo cp -r $HOME/yiimp/blocknotify/blocknotify /usr/bin/
-    sudo cp -r $HOME/yiimp/blocknotify/blocknotify /var/stratum/
-    sudo mkdir -p /etc/yiimp
-    sudo mkdir -p /$HOME/backup/
-    #fixing yiimp
-    sudo sed -i "s|ROOTDIR=/data/yiimp|ROOTDIR=/var|g" /bin/yiimp
-    #fixing run.sh
-    sudo rm -r /var/stratum/config/run.sh
-    echo '
-    #!/bin/bash
-    ulimit -n 10240
-    ulimit -u 10240
-    cd /var/stratum
-    while true; do
-    ./stratum /var/stratum/config/$1
-    sleep 2
-    done
-    exec bash
-    ' | sudo -E tee /var/stratum/config/run.sh >/dev/null 2>&1
-    sudo chmod +x /var/stratum/config/run.sh
-
-    echo -e "$GREEN Done...$COL_RESET"
-
+    source conf/yiimp.sh
 
     # Update Timezone
     echo
@@ -492,7 +264,7 @@
     
         location ~ ^/index\.php$ {
             fastcgi_split_path_info ^(.+\.php)(/.+)$;
-            fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+            fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
             fastcgi_index index.php;
             include fastcgi_params;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
@@ -524,7 +296,7 @@
             deny all;
       }
         location ~ /phpmyadmin/(.+\.php)$ {
-            fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+            fastcgi_pass unix:/run/php/php7.4-fpm.sock;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
             include fastcgi_params;
             include snippets/fastcgi-php.conf;
@@ -535,7 +307,7 @@
 
     sudo ln -s /etc/nginx/sites-available/$server_name.conf /etc/nginx/sites-enabled/$server_name.conf
     sudo ln -s /var/web /var/www/$server_name/html
-    sudo systemctl reload php7.2-fpm.service
+    sudo systemctl reload php7.4-fpm.service
     sudo systemctl restart nginx.service
     echo -e "$GREEN Done...$COL_RESET"
         
@@ -617,7 +389,7 @@
         
             location ~ ^/index\.php$ {
                 fastcgi_split_path_info ^(.+\.php)(/.+)$;
-                fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+                fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
                 fastcgi_index index.php;
                 include fastcgi_params;
                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
@@ -648,7 +420,7 @@
             deny all;
     }
         location ~ /phpmyadmin/(.+\.php)$ {
-            fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+            fastcgi_pass unix:/run/php/php7.4-fpm.sock;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
             include fastcgi_params;
             include snippets/fastcgi-php.conf;
@@ -659,7 +431,7 @@
     ' | sudo -E tee /etc/nginx/sites-available/$server_name.conf >/dev/null 2>&1
     fi
     
-    sudo systemctl reload php7.2-fpm.service
+    sudo systemctl reload php7.4-fpm.service
     sudo systemctl restart nginx.service
     echo -e "$GREEN Done...$COL_RESET"
     
@@ -702,7 +474,7 @@
     
         location ~ ^/index\.php$ {
             fastcgi_split_path_info ^(.+\.php)(/.+)$;
-            fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+            fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
             fastcgi_index index.php;
             include fastcgi_params;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
@@ -734,7 +506,7 @@
             deny all;
     }
         location ~ /phpmyadmin/(.+\.php)$ {
-            fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+            fastcgi_pass unix:/run/php/php7.4-fpm.sock;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
             include fastcgi_params;
             include snippets/fastcgi-php.conf;
@@ -745,7 +517,7 @@
 
     sudo ln -s /etc/nginx/sites-available/$server_name.conf /etc/nginx/sites-enabled/$server_name.conf
     sudo ln -s /var/web /var/www/$server_name/html
-    sudo systemctl reload php7.2-fpm.service
+    sudo systemctl reload php7.4-fpm.service
     sudo systemctl restart nginx.service
     echo -e "$GREEN Done...$COL_RESET"
    
@@ -828,7 +600,7 @@
         
             location ~ ^/index\.php$ {
                 fastcgi_split_path_info ^(.+\.php)(/.+)$;
-                fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+                fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
                 fastcgi_index index.php;
                 include fastcgi_params;
                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
@@ -859,7 +631,7 @@
             deny all;
     }
         location ~ /phpmyadmin/(.+\.php)$ {
-            fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+            fastcgi_pass unix:/run/php/php7.4-fpm.sock;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
             include fastcgi_params;
             include snippets/fastcgi-php.conf;
@@ -872,7 +644,7 @@
     echo -e "$GREEN Done...$COL_RESET"
 
     fi
-    sudo systemctl reload php7.2-fpm.service
+    sudo systemctl reload php7.4-fpm.service
     sudo systemctl restart nginx.service
     fi
     
@@ -1176,8 +948,8 @@
     sudo systemctl status mysql | sed -n "1,3p"
     sudo systemctl restart nginx.service
     sudo systemctl status nginx | sed -n "1,3p"
-    sudo systemctl restart php7.2-fpm.service
-    sudo systemctl status php7.2-fpm | sed -n "1,3p"
+    sudo systemctl restart php7.4-fpm.service
+    sudo systemctl status php7.4-fpm | sed -n "1,3p"
 
 
     echo
