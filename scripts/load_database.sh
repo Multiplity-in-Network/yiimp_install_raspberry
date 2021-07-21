@@ -1,14 +1,7 @@
 #!/bin/bash
-################################################################################
-# Web:    http://multiply.network
+############################################################################
+# Web:    https://multiply.network
 # Source: https://github.com/Multiplity-in-Network/yiimp_install_raspberry
-# Original Author: crombiecrunch
-# Modified by Xavatar
-# Modified by Multiplity in Network
-#
-# Program:
-#   Install yiimp on Ubuntu 20.04 running Nginx, MariaDB, and php7.4
-#   v0.3 (update Julio, 2021)
 #
 # ███╗   ███╗██╗   ██╗██╗  ████████╗██╗██████╗ ██╗     ██╗████████╗██╗   ██╗
 # ████╗ ████║██║   ██║██║  ╚══██╔══╝██║██╔══██╗██║     ██║╚══██╔══╝╚██╗ ██╔╝
@@ -31,101 +24,41 @@
 #      ██║ ╚████║███████╗   ██║   ╚███╔███╔╝╚██████╔╝██║  ██║██║  ██╗
 #      ╚═╝  ╚═══╝╚══════╝   ╚═╝    ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
 #
-################################################################################
+############################################################################
 
-output() {
-  printf "\E[0;33;40m"
-  echo $1
-  printf "\E[0m"ku
-}
-
-displayErr() {
-  echo
-  echo $1
-  echo
-  exit 1
-}
-
-#Add user group sudo + no password
-whoami=$(whoami)
-sudo usermod -aG sudo ${whoami}
-echo '# yiimp
-    # It needs passwordless sudo functionality.
-    '""''"${whoami}"''""' ALL=(ALL) NOPASSWD:ALL
-    ' | sudo -E tee /etc/sudoers.d/${whoami} >/dev/null 2>&1
-
-#Copy needed files
-sudo cp ./conf/functions.sh /etc/
-sudo cp ./conf/editconf.py /usr/bin/
-sudo cp ./utils/screen-scrypt.sh /etc/
-sudo chmod +x /usr/bin/editconf.py
-sudo chmod +x /etc/screen-scrypt.sh
-
-clear
-source /etc/functions.sh
-source ./scripts/brand.sh
-
+# Peforming the SQL import
 echo
-echo -e "$GREEN************************************************************************$COL_RESET"
-echo -e "$GREEN YiimP Install Raspberry v1.0$COL_RESET$CYAN by Multiplity in Network   $COL_RESET"
-echo -e "$GREEN Install yiimp on Ubuntu 20.04 running Nginx, MariaDB, and php7.4       $COL_RESET"
-echo -e "$GREEN************************************************************************$COL_RESET"
+echo
+echo -e "$CYAN => Database 'yiimpfrontend' and users 'panel' and 'stratum' created with password $password and $password2, will be saved for you $COL_RESET"
+echo
+echo -e "Performing the SQL import"
 echo
 sleep 3
 
-# Update package and Upgrade Ubuntu
-source ./scripts/update.sh
+cd $HOME/yiimp/sql
 
-# Check prerequisites
-source ./scripts/prerequisites.sh
+# Import sql dump
+sudo zcat 2020-11-10-yaamp.sql.gz | sudo mysql --defaults-group-suffix=host1
 
-# Get ip values
-source ./scripts/getip.sh
-
-# Enter values
-source ./scripts/values.sh
-
-# Installing Nginx, Mariadb, PHP
-source ./scripts/servers.sh
-
-# Installing other needed files
-source ./scripts/extras.sh
-
-# Installing Package to compile crypto currency
-source ./scripts/crypto.sh
-
-# Generating Random Passwords
-source ./scripts/password.sh
-
-# Test Email
-source ./scripts/email.sh
-
-# Installing Fail2Ban & UFW
-source ./scripts/fail2ban.sh
-
-# Installing PhpMyAdmin
-source ./scripts/phpmyadmin.sh
-
-# Installing Yiimp
-source ./scripts/yiimp.sh
-
-# Update Timezone
-source ./scripts/timezone.sh
-
-# Config Database
-source ./scripts/conf_database.sh
-
-# Config Server
-source ./scripts/conf_server.sh
-
-# Load Database
-source ./scripts/load_database.sh
-
-# Final Directory permissions
-source ./scripts/files.sh
-
-# Restart all services
-source ./scripts/services.sh
-
-# Show resume
-source ./scripts/result.sh
+# Oh the humanity!
+sudo mysql --defaults-group-suffix=host1 --force <2016-04-24-market_history.sql
+sudo mysql --defaults-group-suffix=host1 --force <2016-04-27-settings.sql
+sudo mysql --defaults-group-suffix=host1 --force <2016-05-11-coins.sql
+sudo mysql --defaults-group-suffix=host1 --force <2016-05-15-benchmarks.sql
+sudo mysql --defaults-group-suffix=host1 --force <2016-05-23-bookmarks.sql
+sudo mysql --defaults-group-suffix=host1 --force <2016-06-01-notifications.sql
+sudo mysql --defaults-group-suffix=host1 --force <2016-06-04-bench_chips.sql
+sudo mysql --defaults-group-suffix=host1 --force <2016-11-23-coins.sql
+sudo mysql --defaults-group-suffix=host1 --force <2017-02-05-benchmarks.sql
+sudo mysql --defaults-group-suffix=host1 --force <2017-03-31-earnings_index.sql
+sudo mysql --defaults-group-suffix=host1 --force <2020-06-03-blocks.sql
+sudo mysql --defaults-group-suffix=host1 --force <2017-05-accounts_case_swaptime.sql
+sudo mysql --defaults-group-suffix=host1 --force <2017-06-payouts_coinid_memo.sql
+sudo mysql --defaults-group-suffix=host1 --force <2017-09-notifications.sql
+sudo mysql --defaults-group-suffix=host1 --force <2017-10-bookmarks.sql
+sudo mysql --defaults-group-suffix=host1 --force <2018-09-22-workers.sql
+sudo mysql --defaults-group-suffix=host1 --force <2017-11-segwit.sql
+sudo mysql --defaults-group-suffix=host1 --force <2018-01-stratums_ports.sql
+sudo mysql --defaults-group-suffix=host1 --force <2018-02-coins_getinfo.sql
+sudo mysql --defaults-group-suffix=host1 --force <2019-03-coins_thepool_life.sql
+echo -e "$GREEN Done...$COL_RESET"

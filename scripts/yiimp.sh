@@ -1,14 +1,7 @@
 #!/bin/bash
-################################################################################
-# Web:    http://multiply.network
+############################################################################
+# Web:    https://multiply.network
 # Source: https://github.com/Multiplity-in-Network/yiimp_install_raspberry
-# Original Author: crombiecrunch
-# Modified by Xavatar
-# Modified by Multiplity in Network
-#
-# Program:
-#   Install yiimp on Ubuntu 20.04 running Nginx, MariaDB, and php7.4
-#   v0.3 (update Julio, 2021)
 #
 # ███╗   ███╗██╗   ██╗██╗  ████████╗██╗██████╗ ██╗     ██╗████████╗██╗   ██╗
 # ████╗ ████║██║   ██║██║  ╚══██╔══╝██║██╔══██╗██║     ██║╚══██╔══╝╚██╗ ██╔╝
@@ -31,101 +24,70 @@
 #      ██║ ╚████║███████╗   ██║   ╚███╔███╔╝╚██████╔╝██║  ██║██║  ██╗
 #      ╚═╝  ╚═══╝╚══════╝   ╚═╝    ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
 #
-################################################################################
+############################################################################
 
-output() {
-  printf "\E[0;33;40m"
-  echo $1
-  printf "\E[0m"ku
-}
-
-displayErr() {
-  echo
-  echo $1
-  echo
-  exit 1
-}
-
-#Add user group sudo + no password
-whoami=$(whoami)
-sudo usermod -aG sudo ${whoami}
-echo '# yiimp
-    # It needs passwordless sudo functionality.
-    '""''"${whoami}"''""' ALL=(ALL) NOPASSWD:ALL
-    ' | sudo -E tee /etc/sudoers.d/${whoami} >/dev/null 2>&1
-
-#Copy needed files
-sudo cp ./conf/functions.sh /etc/
-sudo cp ./conf/editconf.py /usr/bin/
-sudo cp ./utils/screen-scrypt.sh /etc/
-sudo chmod +x /usr/bin/editconf.py
-sudo chmod +x /etc/screen-scrypt.sh
-
-clear
-source /etc/functions.sh
-source ./scripts/brand.sh
-
+# Installing Yiimp
 echo
-echo -e "$GREEN************************************************************************$COL_RESET"
-echo -e "$GREEN YiimP Install Raspberry v1.0$COL_RESET$CYAN by Multiplity in Network   $COL_RESET"
-echo -e "$GREEN Install yiimp on Ubuntu 20.04 running Nginx, MariaDB, and php7.4       $COL_RESET"
-echo -e "$GREEN************************************************************************$COL_RESET"
+echo
+echo -e "$CYAN => Installing Yiimp $COL_RESET"
+echo
+echo -e "Grabbing yiimp fron Github, building files and setting file structure."
 echo
 sleep 3
 
-# Update package and Upgrade Ubuntu
-source ./scripts/update.sh
+# Generating Random Password for stratum
+blckntifypass=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 
-# Check prerequisites
-source ./scripts/prerequisites.sh
+# Compil Blocknotify
+cd $HOME
+git clone https://github.com/Multiplity-in-Network/yiimp.git
+cd $HOME/yiimp/blocknotify
+sudo sed -i 's/tu8tu5/'$blckntifypass'/' blocknotify.cpp
+make -j$(($(nproc) + 1))
 
-# Get ip values
-source ./scripts/getip.sh
+# Compil Stratum
+cd $HOME/yiimp/stratum/
+git submodule init && git submodule update
+make -C algos
+make -C sha3
+make -C iniparser
+cd secp256k1 && chmod +x autogen.sh && ./autogen.sh && ./configure --enable-experimental --enable-module-ecdh --with-bignum=no --enable-endomorphism && make
+cd $HOME/yiimp/stratum/
+if [[ ("$BTC" == "y" || "$BTC" == "Y") ]]; then
+  sudo sed -i 's/CFLAGS += -DNO_EXCHANGE/#CFLAGS += -DNO_EXCHANGE/' $HOME/yiimp/stratum/Makefile
+fi
+make -j$(($(nproc) + 1))
 
-# Enter values
-source ./scripts/values.sh
+# Copy Files (Blocknotify,iniparser,Stratum)
+cd $HOME/yiimp
+sudo sed -i 's/AdminRights/'AdminPanel'/' $HOME/yiimp/web/yaamp/modules/site/SiteController.php
+sudo cp -r $HOME/yiimp/web /var/
+sudo mkdir -p /var/stratum
+cd $HOME/yiimp/stratum
+sudo cp -a config.sample/. /var/stratum/config
+sudo cp -r stratum /var/stratum
+sudo cp -r run.sh /var/stratum
+cd $HOME/yiimp
+sudo cp -r $HOME/yiimp/bin/. /bin/
+sudo cp -r $HOME/yiimp/blocknotify/blocknotify /usr/bin/
+sudo cp -r $HOME/yiimp/blocknotify/blocknotify /var/stratum/
+sudo mkdir -p /etc/yiimp
+sudo mkdir -p /$HOME/backup/
+#fixing yiimp
+sudo sed -i "s|ROOTDIR=/data/yiimp|ROOTDIR=/var|g" /bin/yiimp
+#fixing run.sh
+sudo rm -r /var/stratum/config/run.sh
+echo '
+#!/bin/bash
+ulimit -n 10240
+ulimit -u 10240
+cd /var/stratum
+while true; do
+./stratum /var/stratum/config/$1
+sleep 2
+done
+exec bash
+' | sudo -E tee /var/stratum/config/run.sh >/dev/null 2>&1
+sudo chmod +x /var/stratum/config/run.sh
 
-# Installing Nginx, Mariadb, PHP
-source ./scripts/servers.sh
-
-# Installing other needed files
-source ./scripts/extras.sh
-
-# Installing Package to compile crypto currency
-source ./scripts/crypto.sh
-
-# Generating Random Passwords
-source ./scripts/password.sh
-
-# Test Email
-source ./scripts/email.sh
-
-# Installing Fail2Ban & UFW
-source ./scripts/fail2ban.sh
-
-# Installing PhpMyAdmin
-source ./scripts/phpmyadmin.sh
-
-# Installing Yiimp
-source ./scripts/yiimp.sh
-
-# Update Timezone
-source ./scripts/timezone.sh
-
-# Config Database
-source ./scripts/conf_database.sh
-
-# Config Server
-source ./scripts/conf_server.sh
-
-# Load Database
-source ./scripts/load_database.sh
-
-# Final Directory permissions
-source ./scripts/files.sh
-
-# Restart all services
-source ./scripts/services.sh
-
-# Show resume
-source ./scripts/result.sh
+echo -e "$GREEN Done...$COL_RESET"

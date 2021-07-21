@@ -1,4 +1,3 @@
-    
 #!/bin/bash
 ################################################################################
 # Original Author:   Xavatar (https://github.com/xavatar/yiimp_install_scrypt)

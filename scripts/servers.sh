@@ -1,4 +1,4 @@
-#####################################################
+############################################################################
 # Web:    https://multiply.network
 # Source: https://github.com/Multiplity-in-Network/yiimp_install_raspberry
 #
@@ -23,7 +23,7 @@
 #      ██║ ╚████║███████╗   ██║   ╚███╔███╔╝╚██████╔╝██║  ██║██║  ██╗
 #      ╚═╝  ╚═══╝╚══════╝   ╚═╝    ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
 #
-#####################################################
+############################################################################
 
 # Installing Nginx
 echo
@@ -96,9 +96,9 @@ fi
 
 sudo apt -y update
 
-sudo apt -y install php7.4-fpm php7.4-opcache php7.4 php7.4-common php7.4-gd php7.4-mysql php7.4-imap php7.4-cli \
-php7.4-cgi php7.4-curl php7.4-intl php7.4-zip php7.4-mbstring  mcrypt php7.4-sqlite3 php7.4-tidy php7.4-xmlrpc \
-php7.4-xsl php7.4-dev php7.4-pspell php7.4-memcache php7.4-memcached memcached php-imagick imagemagick php-pear \
+sudo apt -y install php7.4 php7.4-fpm php7.4-opcache php7.4-common php7.4-gd php7.4-mysql php7.4-imap php7.4-cli \
+php7.4-cgi php7.4-curl php7.4-intl php7.4-zip php7.4-mbstring mcrypt php7.4-sqlite3 php7.4-tidy php7.4-xmlrpc \
+php7.4-xsl php7.4-dev php7.4-pspell php7.4-memcache php7.4-memcached memcached php7.4-imagick imagemagick php-pear \
 libpsl-dev libnghttp2-dev libmagickwand-dev libmcrypt-dev gcc make autoconf libc-dev pkg-config librecode-dev libruby
 # php-gettext
 

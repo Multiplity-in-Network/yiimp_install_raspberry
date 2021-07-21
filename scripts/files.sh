@@ -1,14 +1,7 @@
 #!/bin/bash
-################################################################################
-# Web:    http://multiply.network
+############################################################################
+# Web:    https://multiply.network
 # Source: https://github.com/Multiplity-in-Network/yiimp_install_raspberry
-# Original Author: crombiecrunch
-# Modified by Xavatar
-# Modified by Multiplity in Network
-#
-# Program:
-#   Install yiimp on Ubuntu 20.04 running Nginx, MariaDB, and php7.4
-#   v0.3 (update Julio, 2021)
 #
 # ███╗   ███╗██╗   ██╗██╗  ████████╗██╗██████╗ ██╗     ██╗████████╗██╗   ██╗
 # ████╗ ████║██║   ██║██║  ╚══██╔══╝██║██╔══██╗██║     ██║╚══██╔══╝╚██╗ ██╔╝
@@ -31,101 +24,50 @@
 #      ██║ ╚████║███████╗   ██║   ╚███╔███╔╝╚██████╔╝██║  ██║██║  ██╗
 #      ╚═╝  ╚═══╝╚══════╝   ╚═╝    ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
 #
-################################################################################
+############################################################################
 
-output() {
-  printf "\E[0;33;40m"
-  echo $1
-  printf "\E[0m"ku
-}
-
-displayErr() {
-  echo
-  echo $1
-  echo
-  exit 1
-}
-
-#Add user group sudo + no password
-whoami=$(whoami)
-sudo usermod -aG sudo ${whoami}
-echo '# yiimp
-    # It needs passwordless sudo functionality.
-    '""''"${whoami}"''""' ALL=(ALL) NOPASSWD:ALL
-    ' | sudo -E tee /etc/sudoers.d/${whoami} >/dev/null 2>&1
-
-#Copy needed files
-sudo cp ./conf/functions.sh /etc/
-sudo cp ./conf/editconf.py /usr/bin/
-sudo cp ./utils/screen-scrypt.sh /etc/
-sudo chmod +x /usr/bin/editconf.py
-sudo chmod +x /etc/screen-scrypt.sh
-
-clear
-source /etc/functions.sh
-source ./scripts/brand.sh
-
+# Final Directory permissions
 echo
-echo -e "$GREEN************************************************************************$COL_RESET"
-echo -e "$GREEN YiimP Install Raspberry v1.0$COL_RESET$CYAN by Multiplity in Network   $COL_RESET"
-echo -e "$GREEN Install yiimp on Ubuntu 20.04 running Nginx, MariaDB, and php7.4       $COL_RESET"
-echo -e "$GREEN************************************************************************$COL_RESET"
+echo
+echo -e "$CYAN => Final Directory permissions $COL_RESET"
 echo
 sleep 3
 
-# Update package and Upgrade Ubuntu
-source ./scripts/update.sh
+whoami=$(whoami)
+sudo usermod -aG www-data $whoami
+sudo usermod -a -G www-data $whoami
 
-# Check prerequisites
-source ./scripts/prerequisites.sh
+sudo find /var/web -type d -exec chmod 775 {} +
+sudo find /var/web -type f -exec chmod 664 {} +
+sudo chgrp www-data /var/web -R
+sudo chmod g+w /var/web -R
 
-# Get ip values
-source ./scripts/getip.sh
+sudo mkdir /var/log/yiimp
+sudo touch /var/log/yiimp/debug.log
+sudo chgrp www-data /var/log/yiimp -R
+sudo chmod 775 /var/log/yiimp -R
 
-# Enter values
-source ./scripts/values.sh
+sudo chgrp www-data /var/stratum -R
+sudo chmod 775 /var/stratum
 
-# Installing Nginx, Mariadb, PHP
-source ./scripts/servers.sh
+sudo mkdir -p /var/yiimp/sauv
+sudo chgrp www-data /var/yiimp -R
+sudo chmod 775 /var/yiimp -R
 
-# Installing other needed files
-source ./scripts/extras.sh
+#Add to contrab screen-scrypt
+(
+  crontab -l 2>/dev/null
+  echo "@reboot sleep 20 && /etc/screen-scrypt.sh"
+) | crontab -
 
-# Installing Package to compile crypto currency
-source ./scripts/crypto.sh
+#fix error screen main "service"
+sudo sed -i 's/service $webserver start/sudo service $webserver start/g' /var/web/yaamp/modules/thread/CronjobController.php
+sudo sed -i 's/service nginx stop/sudo service nginx stop/g' /var/web/yaamp/modules/thread/CronjobController.php
 
-# Generating Random Passwords
-source ./scripts/password.sh
+#fix error screen main "backup sql frontend"
+sudo sed -i "s|/root/backup|/var/yiimp/sauv|g" /var/web/yaamp/core/backend/system.php
+sudo sed -i '14d' /var/web/yaamp/defaultconfig.php
 
-# Test Email
-source ./scripts/email.sh
-
-# Installing Fail2Ban & UFW
-source ./scripts/fail2ban.sh
-
-# Installing PhpMyAdmin
-source ./scripts/phpmyadmin.sh
-
-# Installing Yiimp
-source ./scripts/yiimp.sh
-
-# Update Timezone
-source ./scripts/timezone.sh
-
-# Config Database
-source ./scripts/conf_database.sh
-
-# Config Server
-source ./scripts/conf_server.sh
-
-# Load Database
-source ./scripts/load_database.sh
-
-# Final Directory permissions
-source ./scripts/files.sh
-
-# Restart all services
-source ./scripts/services.sh
-
-# Show resume
-source ./scripts/result.sh
+#Misc
+sudo mv $HOME/yiimp/ $HOME/yiimp-install-only-do-not-run-commands-from-this-folder
+sudo rm -rf /var/log/nginx/*

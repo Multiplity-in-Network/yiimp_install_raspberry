@@ -1,14 +1,7 @@
 #!/bin/bash
-################################################################################
-# Web:    http://multiply.network
+############################################################################
+# Web:    https://multiply.network
 # Source: https://github.com/Multiplity-in-Network/yiimp_install_raspberry
-# Original Author: crombiecrunch
-# Modified by Xavatar
-# Modified by Multiplity in Network
-#
-# Program:
-#   Install yiimp on Ubuntu 20.04 running Nginx, MariaDB, and php7.4
-#   v0.3 (update Julio, 2021)
 #
 # ███╗   ███╗██╗   ██╗██╗  ████████╗██╗██████╗ ██╗     ██╗████████╗██╗   ██╗
 # ████╗ ████║██║   ██║██║  ╚══██╔══╝██║██╔══██╗██║     ██║╚══██╔══╝╚██╗ ██╔╝
@@ -31,101 +24,30 @@
 #      ██║ ╚████║███████╗   ██║   ╚███╔███╔╝╚██████╔╝██║  ██║██║  ██╗
 #      ╚═╝  ╚═══╝╚══════╝   ╚═╝    ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
 #
-################################################################################
+############################################################################
 
-output() {
-  printf "\E[0;33;40m"
-  echo $1
-  printf "\E[0m"ku
-}
-
-displayErr() {
-  echo
-  echo $1
-  echo
-  exit 1
-}
-
-#Add user group sudo + no password
-whoami=$(whoami)
-sudo usermod -aG sudo ${whoami}
-echo '# yiimp
-    # It needs passwordless sudo functionality.
-    '""''"${whoami}"''""' ALL=(ALL) NOPASSWD:ALL
-    ' | sudo -E tee /etc/sudoers.d/${whoami} >/dev/null 2>&1
-
-#Copy needed files
-sudo cp ./conf/functions.sh /etc/
-sudo cp ./conf/editconf.py /usr/bin/
-sudo cp ./utils/screen-scrypt.sh /etc/
-sudo chmod +x /usr/bin/editconf.py
-sudo chmod +x /etc/screen-scrypt.sh
-
-clear
-source /etc/functions.sh
-source ./scripts/brand.sh
-
+# Installing Package to compile crypto currency
 echo
-echo -e "$GREEN************************************************************************$COL_RESET"
-echo -e "$GREEN YiimP Install Raspberry v1.0$COL_RESET$CYAN by Multiplity in Network   $COL_RESET"
-echo -e "$GREEN Install yiimp on Ubuntu 20.04 running Nginx, MariaDB, and php7.4       $COL_RESET"
-echo -e "$GREEN************************************************************************$COL_RESET"
+echo
+echo -e "$CYAN => Installing Package to compile crypto currency $COL_RESET"
 echo
 sleep 3
 
-# Update package and Upgrade Ubuntu
-source ./scripts/update.sh
+sudo apt -y install software-properties-common build-essential
+sudo apt -y install libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils git cmake libboost-all-dev zlib1g-dev libz-dev libseccomp-dev libcap-dev libminiupnpc-dev gettext
+sudo apt -y install libminiupnpc-dev libzmq5
+sudo apt -y install libcanberra-gtk-module libqrencode-dev libzmq3-dev
+sudo apt -y install libqt5gui5 libqt5core5a libqt5webkit5-dev libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler
 
-# Check prerequisites
-source ./scripts/prerequisites.sh
-
-# Get ip values
-source ./scripts/getip.sh
-
-# Enter values
-source ./scripts/values.sh
-
-# Installing Nginx, Mariadb, PHP
-source ./scripts/servers.sh
-
-# Installing other needed files
-source ./scripts/extras.sh
-
-# Installing Package to compile crypto currency
-source ./scripts/crypto.sh
-
-# Generating Random Passwords
-source ./scripts/password.sh
-
-# Test Email
-source ./scripts/email.sh
-
-# Installing Fail2Ban & UFW
-source ./scripts/fail2ban.sh
-
-# Installing PhpMyAdmin
-source ./scripts/phpmyadmin.sh
-
-# Installing Yiimp
-source ./scripts/yiimp.sh
-
-# Update Timezone
-source ./scripts/timezone.sh
-
-# Config Database
-source ./scripts/conf_database.sh
-
-# Config Server
-source ./scripts/conf_server.sh
-
-# Load Database
-source ./scripts/load_database.sh
-
-# Final Directory permissions
-source ./scripts/files.sh
-
-# Restart all services
-source ./scripts/services.sh
-
-# Show resume
-source ./scripts/result.sh
+#    sudo add-apt-repository -y ppa:bitcoin/bitcoin
+#    sudo apt -y update
+#    sudo apt install -y libdb4.8-dev libdb4.8++-dev libdb5.3 libdb5.3++
+wget http://download.oracle.com/berkeley-db/db-4.8.30.zip
+unzip db-4.8.30.zip
+cd db-4.8.30
+cd build_unix/
+sudo ../dist/configure --prefix=/usr/local --enable-cxx
+sudo make
+sudo make install
+sudo apt -y install libdb5.3 libdb5.3++ libdb5.3-dev libdb5.3++-dev
+echo -e "$GREEN Done...$COL_RESET"

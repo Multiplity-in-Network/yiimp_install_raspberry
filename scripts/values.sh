@@ -26,90 +26,34 @@
 #
 ############################################################################
 
-echo
-echo
-echo -e "$CYAN => Check prerequisites : $COL_RESET"
-echo
-
-echo "Operating system"
-if [ "`lsb_release -d | sed 's/.*:\s*//' | sed 's/20\.04\.[0-9]/20.04/' `" == "Ubuntu 20.04 LTS" ]; then
-  DISTRO=20
-  echo "-Ubuntu 20.04 LTS"
-else
-  DISTRO=0
-  echo -e "$RED-`lsb_release -d | sed 's/.*:\s*//'`$COL_RESET"
-  exit
-fi
-
+echo 'PUBLIC_IP='"${PUBLIC_IP}"'
+    PUBLIC_IPV4='"${PUBLIC_IPV4}"'
+    PUBLIC_IPV6='"${PUBLIC_IPV6}"'
+    PRIVATE_IP='"${PRIVATE_IP}"'
+    DISTRO='"${DISTRO}"'
+    ' | sudo -E tee conf/pool.conf >/dev/null 2>&1
 
 echo
-echo "System memory"
-TOTAL_PHYSICAL_MEM=$(head -n 1 /proc/meminfo | awk '{print $2}')
-TOTAL_PHYSICAL_MEM_DISPLAY=$(expr \( \( $TOTAL_PHYSICAL_MEM \* 1024 \) / 1024 \) / 1024)
-if [ $TOTAL_PHYSICAL_MEM -lt 1945600 ]; then
-  if [ ! -d /vagrant ]; then
-    echo " Your Mining Pool Server needs more memory (RAM) to function properly."
-    echo " Please provision a machine with at least 1900 MB, 6144 MB recommended."
-    echo " This machine has $TOTAL_PHYSICAL_MEM_DISPLAY MB memory."
-    exit
-  fi
-else
-  echo "-$TOTAL_PHYSICAL_MEM_DISPLAY MB of RAM"
-fi
-
-if [ $TOTAL_PHYSICAL_MEM -lt 1572000 ]; then
-  echo -e "$RED WARNING: Your Mining Pool Server has less than 1500 MB of RAM.$COL_RESET"
-  echo " It might run unreliably when under heavy load."
-  sleep 5
-fi
-
-
 echo
-echo "Swap memory"
-SWAP_MOUNTED=$(cat /proc/swaps | tail -n+2)
-SWAP_IN_FSTAB=$(grep "swap" /etc/fstab)
-ROOT_IS_BTRFS=$(grep "\/ .*btrfs" /proc/mounts)
-TOTAL_PHYSICAL_MEM=$(head -n 1 /proc/meminfo | awk '{print $2}')
-AVAILABLE_DISK_SPACE=$(df / --output=avail | tail -n 1)
-
-if
-  [ -z "$SWAP_MOUNTED" ] &&
-  [ -z "$SWAP_IN_FSTAB" ] &&
-  [ ! -e /swapfile ] &&
-  [ -z "$ROOT_IS_BTRFS" ] &&
-  [ $TOTAL_PHYSICAL_MEM -lt 4194304 ] &&
-  [ $AVAILABLE_DISK_SPACE -gt 6291456 ]
-then
-  echo "-Adding a swap file to the system..."
-
-  # Allocate and activate the swap file. Allocate in 1KB chuncks
-  # doing it in one go, could fail on low memory systems
-  sudo fallocate -l 3G /swapfile
-  if [ -e /swapfile ]; then
-    sudo chmod 600 /swapfile
-    sudo mkswap /swapfile
-    sudo swapon /swapfile
-    if swapon -s | grep -q "\/swapfile"; then
-      echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-    else
-      echo "$RED ERROR: Swap allocation failed $COL_RESET"
-    fi
-    sudo sysctl vm.swappiness=10
-    sudo sysctl vm.vfs_cache_pressure=50
-    echo "vm.swappiness=10" >> sudo /etc/sysctl.conf
-    echo "vm.vfs_cache_pressure=50" >> sudo /etc/sysctl.conf
-  fi
-else
-  echo "-No need create swap"
-  echo " `free -h | tail -n+3`"
-fi
-
-
-ARCHITECTURE=$(uname -m)
-if [ "$ARCHITECTURE" != "aarch64" ]; then
-    echo -e "$RED YiimP Install Raspberry only supports ARM64 and will not work on any other architecture, like ARM32 or x86_64 OS. $COL_RESET"
-    echo -e "$RED Your architecture is $ARCHITECTURE $COL_RESET"
-    exit
-fi
-
-echo -e "$GREEN Done...$COL_RESET"
+echo -e "$RED Make sure you double check before hitting enter! Only one shot at these! $COL_RESET"
+echo
+read -e -p "Enter time zone (e.g. America/New_York) : " TIME
+echo -e "$CYAN $TIME $COL_RESET"
+read -e -p "Domain Name (no http:// or www. just : example.com or pool.example.com or ${PRIVATE_IP}) : " SERVER_NAME
+echo -e "$CYAN $PRIVATE_IP $COL_RESET"
+read -e -p "Are you using a subdomain (mycryptopool.example.com?) [y/N] : " SUB_DOMAIN
+echo -e "$CYAN $SUB_DOMAIN $COL_RESET"
+read -e -p "Enter support email (e.g. admin@example.com) : " EMAIL
+echo -e "$CYAN $EMAIL $COL_RESET"
+read -e -p "Set Pool to AutoExchange? i.e. mine any coin with BTC address? [y/N] : " BTC
+echo -e "$CYAN $BTC $COL_RESET"
+read -e -p "Please enter a new location for /site/adminRights this is to customize the Admin Panel entrance url (e.g. myAdminpanel) : " ADMIN_PANEL
+echo -e "$CYAN $ADMIN_PANEL $COL_RESET"
+read -e -p "Enter the Public IP of the system you will use to access the admin panel, check http://www.whatsmyip.org/ ($PUBLIC_IP) : " PUBLIC
+echo -e "$CYAN $PUBLIC $COL_RESET"
+read -e -p "Install Fail2ban? [Y/n] : " INSTALL_FAIL2BAN
+echo -e "$CYAN $INSTALL_FAIL2BAN $COL_RESET"
+read -e -p "Install UFW and configure ports? [Y/n] : " UFW
+echo -e "$CYAN $UFW $COL_RESET"
+read -e -p "Install LetsEncrypt SSL? IMPORTANT! You MUST have your domain name pointed to this server prior to running the script!! [Y/n]: " SSL_INSTALL
+echo -e "$CYAN $SSL_INSTALL $COL_RESET"
