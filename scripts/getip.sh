@@ -100,13 +100,14 @@ fi
 # to the Internet. We need these when we want to have services bind only to
 # the public network interfaces (not loopback, not tunnel interfaces).
 if [ -z "$PRIVATE_IP" ]; then
-  DEFAULT_PRIVATE_IP=$(get_default_privateip 4)
-  input_box "Private IP Address (Optional)" \
-    "Enter the private IP address of this machine, as given to you by your ISP.
- \n\nLeave as your public IP if the machine does not have a private IP address.
- \n\nPrivate IP address:" \
-    $DEFAULT_PRIVATE_IP \
-    PRIVATE_IP
+#  DEFAULT_PRIVATE_IP=$(get_default_privateip 4)
+#  input_box "Private IP Address (Optional)" \
+#    "Enter the private IP address of this machine, as given to you by your ISP.
+# \n\nLeave as your public IP if the machine does not have a private IP address.
+# \n\nPrivate IP address:" \
+#    $DEFAULT_PRIVATE_IP \
+#    PRIVATE_IP
+  PRIVATE_IP=$(get_default_privateip 4)
 
   if [ -z "$PRIVATE_IP" ]; then
     user hit ESC/cancel

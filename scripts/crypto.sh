@@ -42,6 +42,7 @@ sudo apt -y install libqt5gui5 libqt5core5a libqt5webkit5-dev libqt5dbus5 qttool
 #    sudo add-apt-repository -y ppa:bitcoin/bitcoin
 #    sudo apt -y update
 #    sudo apt install -y libdb4.8-dev libdb4.8++-dev libdb5.3 libdb5.3++
+cd $YIIMP_INSTALL_PATH/build/
 wget http://download.oracle.com/berkeley-db/db-4.8.30.zip
 unzip db-4.8.30.zip
 cd db-4.8.30
@@ -49,5 +50,6 @@ cd build_unix/
 sudo ../dist/configure --prefix=/usr/local --enable-cxx
 sudo make
 sudo make install
+cd $YIIMP_INSTALL_PATH
 sudo apt -y install libdb5.3 libdb5.3++ libdb5.3-dev libdb5.3++-dev
 echo -e "$GREEN Done...$COL_RESET"

@@ -49,6 +49,7 @@ displayErr() {
 #Add user group sudo + no password
 whoami=$(whoami)
 sudo usermod -aG sudo ${whoami}
+YIIMP_INSTALL_PATH=$(pwd)
 echo '# yiimp
     # It needs passwordless sudo functionality.
     '""''"${whoami}"''""' ALL=(ALL) NOPASSWD:ALL

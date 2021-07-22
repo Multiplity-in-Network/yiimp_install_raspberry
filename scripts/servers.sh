@@ -46,22 +46,20 @@ sudo systemctl start cron.service
 sudo systemctl enable cron.service
 sleep 5
 sudo systemctl status nginx | sed -n "1,3p"
-sleep 15
+sleep 3
 echo
 echo -e "$GREEN Done...$COL_RESET"
 
-
 # Making Nginx a bit hard
 echo 'map $http_user_agent $blockedagent {
-default         0;
-~*malicious     1;
-~*bot           1;
-~*backdoor      1;
-~*crawler       1;
-~*bandit        1;
+  default         0;
+  ~*malicious     1;
+  ~*bot           1;
+  ~*backdoor      1;
+  ~*crawler       1;
+  ~*bandit        1;
 }
 ' | sudo -E tee /etc/nginx/blockuseragents.rules >/dev/null 2>&1
-
 
 # Installing Mariadb
 echo
@@ -73,15 +71,15 @@ sleep 3
 # Create random password
 rootpasswd=$(openssl rand -base64 12)
 export DEBIAN_FRONTEND="noninteractive"
+
 sudo apt -y install mariadb-server
 sudo systemctl enable mariadb.service
 sudo systemctl start mariadb.service
 sleep 5
 sudo systemctl status mariadb | sed -n "1,3p"
-sleep 15
+sleep 3
 echo
 echo -e "$GREEN Done...$COL_RESET"
-
 
 # Installing Installing php7.4
 echo
@@ -92,20 +90,21 @@ sleep 3
 
 if [ ! -f /etc/apt/sources.list.d/ondrej-php-bionic.list ]; then
   sudo add-apt-repository -y ppa:ondrej/php
+  sudo apt -y update
 fi
 
-sudo apt -y update
-
-sudo apt -y install php7.4 php7.4-fpm php7.4-opcache php7.4-common php7.4-gd php7.4-mysql php7.4-imap php7.4-cli \
-php7.4-cgi php7.4-curl php7.4-intl php7.4-zip php7.4-mbstring mcrypt php7.4-sqlite3 php7.4-tidy php7.4-xmlrpc \
-php7.4-xsl php7.4-dev php7.4-pspell php7.4-memcache php7.4-memcached memcached php7.4-imagick imagemagick php-pear \
-libpsl-dev libnghttp2-dev libmagickwand-dev libmcrypt-dev gcc make autoconf libc-dev pkg-config librecode-dev libruby
+sudo apt -y install php7.4 php7.4-fpm php7.4-opcache php7.4-common php7.4-gd php7.4-mysql \
+  php7.4-imap php7.4-cli php7.4-cgi php7.4-curl php7.4-intl php7.4-zip php7.4-mbstring mcrypt \
+  php7.4-sqlite3 php7.4-tidy php7.4-xmlrpc php7.4-xsl php7.4-dev php7.4-pspell php7.4-memcache \
+  php7.4-memcached memcached php7.4-imagick imagemagick php-pear libpsl-dev libnghttp2-dev \
+  libmagickwand-dev libmcrypt-dev gcc make autoconf libc-dev pkg-config librecode-dev libruby
 # php-gettext
 
 sudo pecl channel-update pecl.php.net
 printf "\n" | sudo pecl install mcrypt
 printf "\n" | sudo pecl install imagick
 
+cd $YIIMP_INSTALL_PATH/build/
 wget https://github.com/php/pecl-text-recode/archive/master.zip -O recode.zip
 unzip recode.zip
 cd pecl-text-recode-master
@@ -113,7 +112,7 @@ phpize
 sudo ./configure
 sudo make
 sudo make install
-cd ../
+cd $YIIMP_INSTALL_PATH
 
 sudo bash -c "echo extension=mcrypt.so > /etc/php/7.4/mods-available/mcrypt.ini"
 sudo bash -c "echo extension=imagick.so > /etc/php/7.4/mods-available/imagick.ini"
